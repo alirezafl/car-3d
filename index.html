@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>نمایش سه‌بعدی خودرو</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: #0b0d10; color: #fff;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .page { min-height: 100svh; display:flex; flex-direction:column; }
+    header { padding: 18px 20px 10px; }
+    h1 { margin:0; font-size:20px; }
+    .sub { margin-top:5px; color:#aeb4bd; font-size:13px; }
+    .viewer-wrap { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; }
+    model-viewer {
+      width:100%; height:min(72svh, 720px); min-height:420px;
+      background: radial-gradient(circle at 50% 45%, #252a31 0%, #111419 48%, #090b0e 100%);
+      --poster-color: transparent;
+    }
+    .controls {
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+      padding:14px 16px 8px;
+    }
+    button {
+      min-width:48px; min-height:46px; padding:0 16px;
+      border:1px solid #3a4049; border-radius:14px;
+      background:#171a1f; color:#fff; font-size:14px;
+      cursor:pointer;
+    }
+    button:active { transform:scale(.98); }
+    .hint { text-align:center; color:#9299a3; font-size:12px; padding:5px 18px 18px; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>خودرو — نمای سه‌بعدی</h1>
+    <div class="sub">با انگشت بچرخان • دو انگشت برای زوم • روی موبایل تمام‌صفحه</div>
+  </header>
+
+  <div class="viewer-wrap">
+    <model-viewer id="car"
+      src="./car.glb"
+      camera-controls
+      touch-action="pan-y"
+      interaction-prompt="auto"
+      shadow-intensity="1"
+      exposure="1"
+      camera-orbit="35deg 72deg 4m"
+      min-camera-orbit="auto auto 2m"
+      max-camera-orbit="auto auto 12m"
+      alt="مدل سه‌بعدی خودرو">
+    </model-viewer>
+  </div>
+
+  <div class="controls">
+    <button id="reset" type="button">↺ نمای اصلی</button>
+    <button id="left" type="button">↶ چرخش</button>
+    <button id="right" type="button">چرخش ↷</button>
+    <button id="zoomIn" type="button">＋ زوم</button>
+    <button id="zoomOut" type="button">－ زوم</button>
+  </div>
+  <div class="hint">نسخه آزمایشی Viewer — آماده اتصال به لینک واتساپ</div>
+</div>
+
+<script>
+(() => {
+  const viewer = document.getElementById('car');
+  const initial = '35deg 72deg 4m';
+  const setOrbit = (yawDelta) => {
+    const current = viewer.getCameraOrbit();
+    let yaw = current.theta * 180 / Math.PI + yawDelta;
+    const pitch = current.phi * 180 / Math.PI;
+    const radius = current.radius;
+    viewer.cameraOrbit = `${yaw}deg ${pitch}deg ${radius}m`;
+  };
+  const setZoom = (factor) => {
+    const current = viewer.getCameraOrbit();
+    const radius = Math.max(2, Math.min(12, current.radius * factor));
+    viewer.cameraOrbit = `${current.theta * 180 / Math.PI}deg ${current.phi * 180 / Math.PI}deg ${radius}m`;
+  };
+  document.getElementById('reset').addEventListener('click', () => viewer.cameraOrbit = initial);
+  document.getElementById('left').addEventListener('click', () => setOrbit(-25));
+  document.getElementById('right').addEventListener('click', () => setOrbit(25));
+  document.getElementById('zoomIn').addEventListener('click', () => setZoom(.82));
+  document.getElementById('zoomOut').addEventListener('click', () => setZoom(1.22));
+})();
+</script>
+</body>
+</html>
